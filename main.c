@@ -46,12 +46,12 @@ Image readImage(FILE *f, int height, int width)
 {
     printf("Début de lecture sur ReadImage\n");
     Image I;
-    I.rgb = malloc(height * width * 3); //(RGB**) malloc(height * sizeof(void *));
+    I.rgb = (RGB**) malloc(height * sizeof(void *));
     I.height = height;
     I.width = width;
 
     for (int i = height - 1; i >= 0; i--) {
-        I.rgb[i] = (RGB *) malloc(width * sizeof(RGB));
+        I.rgb[i] = (RGB*) malloc(width * sizeof(RGB));
         fread(I.rgb[i], width, sizeof(RGB), f);
     }
     printf("Fin de lecture sur ReadImage\n");
@@ -150,6 +150,12 @@ void readbmpheader(char *bitmapfilename)
 
     fseek(bitmapfile, header.offsetbits, SEEK_SET);
     Image image = readImage(bitmapfile, info.height, info.width);
+    for (int i = 0; i < image.height; i++) {
+        for (int j = 0; j < image.width; j++) {
+            printf("%d %d %d /", image.rgb[i][j].red, image.rgb[i][j].green, image.rgb[i][j].blue);
+        }
+        printf("\n");
+    }
     BlackAndWhite(header, info, image);
     fclose(bitmapfile);
     freeImage(image);
@@ -157,6 +163,6 @@ void readbmpheader(char *bitmapfilename)
 
 int main()
 {
-    readbmpheader("Avion.bmp");
+    readbmpheader("Gndal.bmp");
     return 0;
 }
