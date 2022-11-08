@@ -20,5 +20,6 @@ typedef struct
 
 Image readImage(FILE *f, int height, int width);
 void freeImage(Image I);
+void getCoordinates(Image I);
 
 #endif

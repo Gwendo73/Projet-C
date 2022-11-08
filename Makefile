@@ -1,3 +1,5 @@
+all : main clean
+
 main: main.o image.o bmp.o
 	gcc -o main main.o image.o bmp.o
 
