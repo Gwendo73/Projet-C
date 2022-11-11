@@ -4,6 +4,7 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
+// RGB becomes BGR because we read the file upside-down
 typedef struct
 {
     unsigned char blue;

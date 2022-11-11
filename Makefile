@@ -13,4 +13,8 @@ bmp.o : bmp.c
 	gcc -c -Wall bmp.c
 
 clean:
-	rm -f *.o 
+ifeq ($(OS),Windows_NT)
+	del /F *.o
+else
+	rm -f *.o
+endif
