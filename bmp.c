@@ -14,7 +14,7 @@ void readBMPHeader(FILE *bitmapfile, BMPHeader *header, BMPInfo *info)
     fread(info, sizeof(BMPInfo), 1, bitmapfile);
 }
 
-void printBMPHeader(char name[2], BMPHeader header, BMPInfo info)
+void printBMPHeader(char* name, BMPHeader header, BMPInfo info)
 {
     printf("Type de bitmap\n");
     printf("%c%c\n", name[0], name[1]);

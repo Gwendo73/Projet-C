@@ -28,6 +28,6 @@ typedef struct
 } BMPInfo;
 
 void readBMPHeader (FILE* bitmapfile, BMPHeader *header, BMPInfo *info);
-void printBMPHeader (char name[2], BMPHeader header, BMPInfo info);
+void printBMPHeader (char* name, BMPHeader header, BMPInfo info);
 
 #endif

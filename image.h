@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "bmp.h"
 
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
@@ -19,8 +20,17 @@ typedef struct
     RGB **rgb;
 } Image;
 
+typedef struct 
+{
+    int x;
+    int y;
+} Coordinates;
+
 Image readImage(FILE *f, int height, int width);
 void freeImage(Image I);
-void getCoordinates(Image I);
+Coordinates getCoordinates(Image I);
+void printPixels(Image I);
+void createImage(BMPHeader header, BMPInfo info, Image I);
+void freemanArray(Image I);
 
 #endif

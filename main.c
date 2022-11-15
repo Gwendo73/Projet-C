@@ -13,13 +13,14 @@ int main()
     BMPInfo *infoptr = &info;
 
     readBMPHeader(bitmapfile, headerptr, infoptr);
-    //printBMPHeader(&header.name, header, info);
+    //printBMPHeader(header.name, header, info);
 
     fseek(bitmapfile, header.offsetbits, SEEK_SET);
     Image image = readImage(bitmapfile, info.height, info.width);
 
-    getCoordinates(image);
-    
+    //getCoordinates(image);
+    //createImage(header, info, image);
+    freemanArray(image);
     fclose(bitmapfile);
     freeImage(image);
     return 0;
