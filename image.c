@@ -33,24 +33,21 @@ Coordinates getCoordinates(Image I)
 {
     int found = 1;
     Coordinates coordinate = {0, 0};
-
-        for (int i = 0; i < I.height; i++)
+    for (int i = 0; i < I.height; i++)
+    {
+        for (int j = 0; j < I.width; j++)
         {
-            for (int j = 0; j < I.width; j++)
+            if (found == 1) 
             {
-                if (found == 1)
+                if (I.rgb[i][j].red == 255 && I.rgb[i][j].green == 0 && I.rgb[i][j].blue == 0)
                 {
-                    if (I.rgb[i][j].red == 255 && I.rgb[i][j].green == 0 && I.rgb[i][j].blue == 0)
-                    {
-                    
-                        found = 0;
-                        coordinate.x = j;
-                        coordinate.y = i;
-                        break;
-                    }
+                    found = 0;
+                    coordinate.x = j;
+                    coordinate.y = i;
                 }
             }
         }
+    }
     return coordinate;
 }
 
@@ -81,73 +78,84 @@ void createImage(BMPHeader header, BMPInfo info, Image I)
 
 
 void freemanArray(Image I) {
-    int array[100] = {};
+    int *vectors = (int *)malloc(sizeof(int) * 200);
     int k = 0;
-    Coordinates coordinate = getCoordinates(I); // x/j: 17, y/i: 17
-    int i = coordinate.y;
-    int j = coordinate.x;
-    printf("i : %d, j : %d \n", i, j);
-    // En haut 
-    if (I.rgb[i + 1][j].red == 255 && I.rgb[i + 1][j].green == 0 && I.rgb[i + 1][j].blue == 0)
-    {
-        printf("0");
-        array[k] = 0;
-        i++;
-    }
-    // En haut à droite 
-    else if (I.rgb[i + 1][j+1].red == 255 && I.rgb[i + 1][j+1].green == 0 && I.rgb[i + 1][j+1].blue == 0)
-    {
-        printf("1");
-        array[k] = 1;
-        i++;
-        j++;
-    }
-    // A droite
-    else if (I.rgb[i][j + 1].red == 255 && I.rgb[i][j + 1].green == 0 && I.rgb[i][j + 1].blue == 0)
-    {
-        printf("2");
-        array[k] = 2;
-        j++;
-    }
-    // En bas à droite
-    else if (I.rgb[i - 1][j + 1].red == 255 && I.rgb[i - 1][j + 1].green == 0 && I.rgb[i - 1][j + 1].blue == 0)
-    {
-        printf("3");
-        array[k] = 3;
-        i--;
-        j++;
-    }
-    // En bas
-    else if (I.rgb[i - 1][j].red == 255 && I.rgb[i - 1][j].green == 0 && I.rgb[i - 1][j].blue == 0)
-    {
-        printf("4");
-        array[k] = 4;
-        i--;
-    }
-    // En bas à gauche
-    else if (I.rgb[i - 1][j - 1].red == 255 && I.rgb[i - 1][j - 1].green == 0 && I.rgb[i - 1][j - 1].blue == 0)
-    {
-        printf("5");
-        array[k] = 5;
-        i--;
-        j--;
-    }
-    // A gauche
-    else if (I.rgb[i][j - 1].red == 255 && I.rgb[i][j - 1].green == 0 && I.rgb[i][j - 1].blue == 0)
-    {
-        printf("6");
-        array[k] = 6;
-        j--;
-    }
-    // En haut à gauche
-    else if (I.rgb[i + 1][j - 1].red == 255 && I.rgb[i + 1][j - 1].green == 0 && I.rgb[i + 1][j - 1].blue == 0)
-    {
-        printf("7");
-        array[k] = 7;
-        i++;
-        j--;
-    }
+    Coordinates coordinate = getCoordinates(I);
+    int x = coordinate.y;
+    int y = coordinate.x;
+    vectors[k] = freemanCase(I, &x, &y, -1);
     k++;
+    while (coordinate.x != x || coordinate.y != y)
+    {
+        vectors[k] = freemanCase(I, &x, &y, vectors[k - 1]);
+        k++;
+    }
+    int *newVectors = (int *)malloc(sizeof(int) * k);
+    for (int i = 0; i < k; i++) {
+        newVectors[i] = vectors[i];
+        printf("%d", newVectors[i]);
+    }
+    free(vectors);
 }
-   
+
+int freemanCase (Image I, int* x, int* y, int previous) {
+
+    int value = 0;
+    //printf("x : %d, y : %d, %u %u %u\n", *x, *y, I.rgb[*x][*y].red, I.rgb[*x][*y].blue, I.rgb[*x][*y].green);
+    // Right
+    if (I.rgb[*x][*y + 1].red == 255 && I.rgb[*x][*y + 1].green == 0 && I.rgb[*x][*y + 1].blue == 0 && previous != 4)
+    {
+        value = 0;
+        *y += 1;
+    }
     
+    // Down Right
+    else if (I.rgb[*x + 1][*y + 1].red == 255 && I.rgb[*x + 1][*y + 1].green == 0 && I.rgb[*x + 1][*y + 1].blue == 0 && previous != 5)
+    {
+        value = 1;
+        *x += 1;
+        *y += 1;
+    }
+    // Down
+    else if (I.rgb[*x + 1][*y].red == 255 && I.rgb[*x + 1][*y].green == 0 && I.rgb[*x + 1][*y].blue == 0 && previous != 6)
+    {
+        value = 2;
+        *x += 1;
+    }
+    // Down Left
+    else if (I.rgb[*x + 1][*y - 1].red == 255 && I.rgb[*x + 1][*y - 1].green == 0 && I.rgb[*x + 1][*y - 1].blue == 0 && previous != 7)
+    {
+        value = 3;
+        *x += 1;
+        *y -= 1;
+    }
+    // Left
+    else if (I.rgb[*x][*y - 1].red == 255 && I.rgb[*x][*y - 1].green == 0 && I.rgb[*x][*y - 1].blue == 0 && previous != 0)
+    {
+        value = 4;
+        *y -= 1;
+    }
+    // Up Left
+    else if (I.rgb[*x - 1][*y - 1].red == 255 && I.rgb[*x - 1][*y - 1].green == 0 && I.rgb[*x - 1][*y - 1].blue == 0 && previous != 1)
+    {
+        value = 5;
+        *x -= 1;
+        *y -= 1;
+    }
+    // Up
+    else if (I.rgb[*x - 1][*y].red == 255 && I.rgb[*x - 1][*y].green == 0 && I.rgb[*x - 1][*y].blue == 0 && previous != 2)
+    {
+        value = 6;
+        *x -= 1;
+    }
+    // Up Right
+    else if (I.rgb[*x - 1][*y + 1].red == 255 && I.rgb[*x - 1][*y + 1].green == 0 && I.rgb[*x - 1][*y + 1].blue == 0 && previous != 3)
+    {
+        value = 7;
+        *x -= 1;
+        *y += 1;
+    }
+    //printf("%d\n", value);
+    return value;
+}
+

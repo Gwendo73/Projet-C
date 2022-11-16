@@ -32,5 +32,6 @@ Coordinates getCoordinates(Image I);
 void printPixels(Image I);
 void createImage(BMPHeader header, BMPInfo info, Image I);
 void freemanArray(Image I);
+int freemanCase(Image I, int *x, int *y, int previous);
 
 #endif
