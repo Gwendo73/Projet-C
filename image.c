@@ -96,6 +96,7 @@ void freemanArray(Image I) {
         printf("%d", newVectors[i]);
     }
     free(vectors);
+    free(newVectors);
 }
 
 int freemanCase (Image I, int* x, int* y, int previous) {
