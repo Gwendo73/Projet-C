@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "image.h"
 
 Image readImage(FILE *f, int height, int width)
@@ -85,7 +86,7 @@ void freemanArray(Image I) {
     int y = coordinate.x;
     vectors[k] = freemanCase(I, &x, &y, -1);
     k++;
-    while (coordinate.x != x || coordinate.y != y)
+    while (coordinate.x != y || coordinate.y != x)
     {
         vectors[k] = freemanCase(I, &x, &y, vectors[k - 1]);
         k++;
@@ -160,3 +161,31 @@ int freemanCase (Image I, int* x, int* y, int previous) {
     return value;
 }
 
+/* Calcul des coordonées du barycentre entre 2 points (fonction intermédiaire)*/
+
+Coordinates barycentre(Coordinates coordinateA, Coordinates coordinateB){
+    Coordinates bary;
+    bary.x = (coordinateA.x+coordinateB.x)/2;
+    bary.y = (coordinateA.y+coordinateB.y)/2;
+    return bary;
+}
+
+
+double coefdir(Coordinates coordinateA, Coordinates coordinateB)
+{
+    return ((coordinateB.x-coordinateA.x)/(coordinateB.y-coordinateA.y));
+}
+
+double distance(Coordinates coordinateI, Coordinates coordinateJ){
+    return sqrt(pow((coordinateJ.x-coordinateI.x),2)+pow((coordinateJ.x-coordinateI.y),2));
+}
+
+int perpendiculaire(double codir){
+    int x1, y1, x2, y2;
+    double theta;
+    theta = atan(codir);
+    x1 = cos(theta);
+    y1 = sin(theta);
+    x2 = -cos(theta);
+    y2 = -sin(theta);
+}
