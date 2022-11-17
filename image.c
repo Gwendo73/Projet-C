@@ -78,7 +78,7 @@ void createImage(BMPHeader header, BMPInfo info, Image I)
 
 
 void freemanArray(Image I) {
-    int *vectors = (int *)malloc(sizeof(int) * 200);
+    int *vectors = (int *)malloc(sizeof(int) * 500);
     int k = 0;
     Coordinates coordinate = getCoordinates(I);
     int x = coordinate.y;

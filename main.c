@@ -6,7 +6,7 @@
 
 int main()
 {
-    FILE *bitmapfile = fopen("pixel.bmp", "rb");
+    FILE *bitmapfile = fopen("FLECHE.bmp", "rb");
     BMPHeader header;
     BMPHeader *headerptr = &header;
     BMPInfo info;
