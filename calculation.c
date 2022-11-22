@@ -1,5 +1,31 @@
 #include "calculation.h"
 
+void freemanArray(Image I)
+{
+    int *vectors = (int *)malloc(sizeof(int) * 500);
+    int k = 0;
+    Coordinates coordinate = getCoordinates(I);
+    Coordinates newCoordinate = {coordinate.y, coordinate.x};
+    Coordinates startCoord;
+    vectors[k] = freemanCase(I, &newCoordinate.x, &newCoordinate.y, -1);
+    k++;
+    while (coordinate.x != newCoordinate.y || coordinate.y != newCoordinate.x)
+    {
+        startCoord = newCoordinate;
+        vectors[k] = freemanCase(I, &newCoordinate.x, &newCoordinate.y, vectors[k - 1]);
+        coefdir(startCoord, newCoordinate);
+        k++;
+    }
+    int *newVectors = (int *)malloc(sizeof(int) * k);
+    for (int i = 0; i < k; i++)
+    {
+        newVectors[i] = vectors[i];
+        printf("%d", newVectors[i]);
+    }
+    free(vectors);
+    free(newVectors);
+}
+
 int freemanCase(Image I, int *x, int *y, int previous)
 {
     int value = 0;
@@ -81,13 +107,64 @@ double distance(Coordinates coordinateI, Coordinates coordinateJ)
     return sqrt(pow((coordinateJ.x - coordinateI.x), 2) + pow((coordinateJ.x - coordinateI.y), 2));
 }
 
-int perpendiculaire(double codir)
+float* perpendiculaire(double codir)
 {
-    int x1, y1, x2, y2;
-    double theta;
-    theta = atan(codir);
-    x1 = cos(theta);
-    y1 = sin(theta);
-    x2 = -cos(theta);
-    y2 = -sin(theta);
+    float Proj[2]
+    double theta = atan(codir);
+    Proj[0] = cos(theta);    // projection sur x
+    Proj[1] = sin(theta);    // projection sur y 
+    return Proj;
+}
+
+
+// P : Tableau des projections multipliés par un facteur entier dans un while de la boucle main (si question demander à César)
+
+ Coordinates CoordIntersection (int* P, Coordinates coordbary)
+ {
+    Coordinates inter;
+    inter.x = coordbary.x * P[0];
+    inter.y = coordbary.y * P[1];
+    return inter;     
+    }
+ 
+float Evaluation (Coordinates inter, Image I, Coordinates coordbary, double dst)
+{
+    float d; 
+    if (I.rgb[inter.x][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    // Droite
+    if (I.rgb[inter.x][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Diagonale droite bas
+    if (I.rgb[inter.x+1][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Bas
+    if (I.rgb[inter.x+1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Diagonale gauche bas
+    if (I.rgb[inter.x+1][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Gauche
+    if (I.rgb[inter.x][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Diagonale gauche haut 
+    if (I.rgb[inter.x-1][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Haut 
+    if (I.rgb[inter.x-1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //Diagonale haut droite
+    if (I.rgb[inter.x-1][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
+        d = distance(coordbary, inter);
+    }
+    //if ()
+
 }

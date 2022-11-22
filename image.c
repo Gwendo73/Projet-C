@@ -72,29 +72,3 @@ void createImage(BMPHeader header, BMPInfo info, Image I)
     }
     fclose(f);
 }
-
-
-
-void freemanArray(Image I) {
-    int *vectors = (int *)malloc(sizeof(int) * 500);
-    int k = 0;
-    Coordinates coordinate = getCoordinates(I);
-    int x = coordinate.y;
-    int y = coordinate.x;
-    vectors[k] = freemanCase(I, &x, &y, -1);
-    k++;
-    while (coordinate.x != y || coordinate.y != x)
-    {
-        vectors[k] = freemanCase(I, &x, &y, vectors[k - 1]);
-        k++;
-    }
-    int *newVectors = (int *)malloc(sizeof(int) * k);
-    for (int i = 0; i < k; i++) {
-        newVectors[i] = vectors[i];
-        printf("%d", newVectors[i]);
-    }
-    free(vectors);
-    free(newVectors);
-}
-
-
