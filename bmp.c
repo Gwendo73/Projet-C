@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "bmp.h"
 
 void readBMPHeader(FILE *bitmapfile, BMPHeader *header, BMPInfo *info)

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "bmp.h"
 #include "image.h"
+#include "calculation.h"
 
 
 int main()
