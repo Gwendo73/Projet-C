@@ -22,6 +22,8 @@ int main()
     //getCoordinates(image);
     //createImage(header, info, image);
     freemanArray(image);
+    
+
     fclose(bitmapfile);
     freeImage(image);
     return 0;
