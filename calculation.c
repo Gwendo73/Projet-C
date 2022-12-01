@@ -2,49 +2,55 @@
 
 void freemanArray(Image I)
 {
-    int *vectors = (int *)malloc(sizeof(int) * 500);
-    Coordinates *figure = (Coordinates *)malloc(sizeof(Coordinates) * 100);
+    int value = 0;
+    Coordinates *figure = (Coordinates *)malloc(sizeof(Coordinates) * 500);
     int k = 0;
     int l = 0;
+    float distance = 0;
     double directingCoefficient = 0;
-    float P[2] = {0, 0};
+    float *P = (float *)malloc(sizeof(float) * 2);
     Coordinates coordinate = getCoordinates(I);
     Coordinates newCoordinate = {coordinate.y, coordinate.x};
     Coordinates startCoord = {newCoordinate.x, newCoordinate.y};
-    Coordinates interCoord = {0, 0};
-    vectors[k] = freemanCase(I, &newCoordinate.x, &newCoordinate.y, -1);
+    Coordinates baryCoord = {0, 0};
+    value = freemanCase(I, &newCoordinate.x, &newCoordinate.y, -1);
     k++;
     while (coordinate.x != newCoordinate.y || coordinate.y != newCoordinate.x)
     {
-        if (k > 0) { // Si distance superieur à XXX alors on change de point de départ
-            figure[l] = startCoord;
-            startCoord.x = newCoordinate.x;
-            startCoord.y = newCoordinate.y;
-            l++;
-        }
-        vectors[k] = freemanCase(I, &newCoordinate.x, &newCoordinate.y, vectors[k - 1]);
+        value = freemanCase(I, &newCoordinate.x, &newCoordinate.y, value);
         /// Nouvelles fonctions
-        interCoord = barycentre(startCoord, newCoordinate);
-        directingCoefficient = coefdir(startCoord, interCoord);
-        P = projection(directingCoefficient);
-        interCoord = coordIntersection(P, interCoord); // remplacer intercoord
-        /// 
+        if (k % 3 == 0)
+        {
+            baryCoord = barycentre(startCoord, newCoordinate);
+            directingCoefficient = coefdir(startCoord, baryCoord);
+            P = projection(directingCoefficient);
+            distance = recherche(I, baryCoord, P);
+            if (distance > 10)
+            { // Si distance superieur à XXX alors on change de point de départ
+                figure[l] = startCoord;
+                startCoord.x = newCoordinate.x;
+                startCoord.y = newCoordinate.y;
+                l++;
+            }
+        }
+        ///
         k++;
     }
-    int *newVectors = (int *)malloc(sizeof(int) * k);
+    // int *newVectors = (int *)malloc(sizeof(int) * k);
     Coordinates *newFigure = (Coordinates *)malloc(sizeof(Coordinates) * l);
-    for (int i = 0; i < k; i++)
-    {
-        newVectors[i] = vectors[i];
-        printf("%d", newVectors[i]);
-    }
+    // for (int i = 0; i < k; i++)
+    // {
+    //     newVectors[i] = vectors[i];
+    //     printf("%d", newVectors[i]);
+    // }
     for (int i = 0; i < l; i++)
     {
         newFigure[i] = figure[i];
+        printf("%d, x : %d, y : %d\n", i + 1, newFigure[i].y, newFigure[i].x);
     }
-    free(vectors);
+    // free(vectors);
     free(figure);
-    free(newVectors);
+    // free(newVectors);
 }
 
 int freemanCase(Image I, int *x, int *y, int previous)
@@ -122,7 +128,16 @@ Coordinates barycentre(Coordinates coordinateA, Coordinates coordinateB)
 
 double coefdir(Coordinates coordinateA, Coordinates coordinateB)
 {
-    return ((coordinateB.x - coordinateA.x) / (coordinateB.y - coordinateA.y));
+    double coefficientX = coordinateB.x - coordinateA.x;
+    double coefficientY = coordinateB.y - coordinateA.y;
+    if (coefficientX == 0 || coefficientY == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return (coordinateB.x - coordinateA.x) / (coordinateB.y - coordinateA.y);
+    }
 }
 
 // Calcul de la dictance entre le barycentre et la point évalué.
@@ -132,9 +147,9 @@ double distance(Coordinates coordinateI, Coordinates coordinateJ)
     return sqrt(pow((coordinateJ.x - coordinateI.x), 2) + pow((coordinateJ.x - coordinateI.y), 2));
 }
 
-// Retourne les projections sur x et y 
+// Retourne les projections sur x et y
 
-float* projection(double dirCo)
+float *projection(double dirCo)
 {
     double theta = atan(dirCo);
     float *proj = (float *)malloc(sizeof(float) * 2);
@@ -143,68 +158,102 @@ float* projection(double dirCo)
     return proj;
 }
 
+//- Evaluer les 8 cases autour du point de coordonées inter calculées à la fonction CoordIntersection
+//- Regarder si une d'entre elles est rouge
+//- Si oui, calcul de la distance entre inter et le barycentre
+//- Si non, passage au point suivant
 
- // P : Tableau des projections multipliés par un facteur entier dans un while de la boucle main (si question demander à César)
-
-Coordinates coordIntersection (float* P, Coordinates coordBary)
+float Evaluation(Coordinates inter, Image I, Coordinates coordBary)
 {
-    Coordinates inter = {coordbary.x * P[0], coordbary.y * P[1]};
-    return inter;     
-}
-
-
-//- évaluer les 8 cases autour du point de coordonées inter calculées à la fonction CoordIntersection
-//- Regarder si une d'entre elles est rouge 
-//- Si oui, calcul de la distance entre inter et le barycentre 
-//- Si non, passage au point suivant 
-
-float Evaluation (Coordinates inter, Image I, Coordinates coordbary, double dst)
-{
-    float d;
+    float d = 0;
     int found = 0;
+    if (inter.x + 1 == I.height || inter.y + 1 == I.width || inter.x - 1 == -1 || inter.y - 1 == -1)
+    {
+        d = -1;
+    }
+    else
+    {
+        if (I.rgb[inter.x][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Droite
+        else if (I.rgb[inter.x][inter.y + 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Diagonale droite bas
+        else if (I.rgb[inter.x + 1][inter.y + 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Bas
+        else if (I.rgb[inter.x + 1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Diagonale gauche bas
+        else if (I.rgb[inter.x + 1][inter.y - 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Gauche
+        else if (I.rgb[inter.x][inter.y - 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Diagonale gauche haut
+        else if (I.rgb[inter.x - 1][inter.y - 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Haut
+        else if (I.rgb[inter.x - 1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+        // Diagonale haut droite
+        else if (I.rgb[inter.x - 1][inter.y + 1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0)
+        {
+            found = 1;
+        }
+    }
 
-    if (I.rgb[inter.x][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
+    if (found == 1)
+    {
+        d = distance(coordBary, inter);
     }
-    // Droite
-    else if (I.rgb[inter.x][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Diagonale droite bas
-    else if (I.rgb[inter.x+1][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Bas
-    else if (I.rgb[inter.x+1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Diagonale gauche bas
-    else if (I.rgb[inter.x+1][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Gauche
-    else if (I.rgb[inter.x][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Diagonale gauche haut 
-    else if (I.rgb[inter.x-1][inter.y-1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Haut 
-    else if (I.rgb[inter.x-1][inter.y].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-    //Diagonale haut droite
-    else if (I.rgb[inter.x-1][inter.y+1].red == 255 && I.rgb[inter.x][inter.y].green == 0 && I.rgb[inter.x][inter.y].blue == 0){
-        found = 1;
-    }
-
-    if(found == 1) {
-        d = distance(coordbary, inter);
-    }
-    else {
+    else
+    {
         d = -1;
     }
 
+    return d;
+}
+
+float recherche(Image I, Coordinates coordBary, float *P)
+{
+    int j = 0;
+    int i = 1;
+    float d = -1;
+    Coordinates inter = {coordBary.x + P[0], coordBary.y + P[1]}; // P : Tableau des projections multipliés par un facteur entier dans un while de la boucle main (si question demander à César)
+    Coordinates newCoord = {0, 0};
+
+    while (d == -1)
+    {
+        if (j % 2 == 0)
+        {
+            newCoord.x = i * P[0] + inter.x;
+            newCoord.y = i * P[1] + inter.y;
+        }
+        else
+        {
+            newCoord.x = -i * P[0] + inter.x;
+            newCoord.y = -i * P[1] + inter.y;
+            i++;
+        }
+        d = Evaluation(newCoord, I, coordBary);
+        j++;
+    }
     return d;
 }
