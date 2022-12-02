@@ -7,7 +7,7 @@
 
 int main()
 {
-    FILE *bitmapfile = fopen("cercle.bmp", "rb");
+    FILE *bitmapfile = fopen("cercleBis.bmp", "rb");
     BMPHeader header;
     BMPHeader *headerptr = &header;
     BMPInfo info;
