@@ -1,44 +1,64 @@
-#include "calculation.h"
+#include "headers/calculation.h"
 
-Coordinates* freemanArray(Image I, int *l)
+/// @brief Calculate the best solution to represent our figure with coordinates
+/// @param I : BMP Image
+/// @param l : Number of coordinates
+/// @return the coordinates of our new figure
+
+Coordinates *figureCoordinates(Image I, int *l)
 {
+    // Value of the vector
     int value = 0;
+    // Memory allocation for our figure points
     Coordinates *figure = malloc(sizeof(Coordinates) * 500);
     int k = 0;
+    // Distance between barycentre and nearest perpendicular point
     float distance = 0;
+    // Trigonometry projection
     float *P = (float *)malloc(sizeof(float) * 2);
-    Coordinates coordinate = getCoordinates(I);
-    Coordinates newCoordinate = {coordinate.x, coordinate.y};
-    Coordinates startCoord = {newCoordinate.x, newCoordinate.y};
+    // First coordinates to intercept on the bmp
+    Coordinates coordinate = getFirstCoordinates(I);
+    // Cuurent coordinates of our route
+    Coordinates currentCoordinates = {coordinate.x, coordinate.y};
+    // Coordinates of the previous starting point remembered
+    Coordinates startCoord = {currentCoordinates.x, currentCoordinates.y};
+    // Coordinates of the barycentre between the currentCoordinates and the start Coordinates
     Coordinates baryCoord = {0, 0};
-    value = freemanCase(I, &newCoordinate.y, &newCoordinate.x, -1);
+    value = nextPixel(I, &currentCoordinates.y, &currentCoordinates.x, -1);
     k++;
     figure[*l] = startCoord;
     *l += 1;
-    while (coordinate.x != newCoordinate.x || coordinate.y != newCoordinate.y)
+    while (coordinate.x != currentCoordinates.x || coordinate.y != currentCoordinates.y)
     {
-        value = freemanCase(I, &newCoordinate.y, &newCoordinate.x, value);
-        /// Nouvelles fonctions
-        baryCoord = barycentre(startCoord, newCoordinate);
+        // Reaching next colored pixel
+        value = nextPixel(I, &currentCoordinates.y, &currentCoordinates.x, value);
+        // Calculate Barycentre
+        baryCoord = barycentre(startCoord, currentCoordinates);
+        // Calculate Trigonometry
         P = projection(startCoord, baryCoord);
-        distance = recherche(I, baryCoord, P);
+        // Calculate perpendicular distance
+        distance = research(I, baryCoord, P);
         if (distance > 10)
-        { // Si distance superieur à XXX alors on change de point de départ
-            figure[*l] = newCoordinate;
-            startCoord.x = newCoordinate.x;
-            startCoord.y = newCoordinate.y;
+        {
+            figure[*l] = currentCoordinates;
+            startCoord.x = currentCoordinates.x;
+            startCoord.y = currentCoordinates.y;
             *l += 1;
         }
-        ///
         k++;
     }
     return figure;
 }
 
-int freemanCase(Image I, int *x, int *y, int previous)
+/// @brief Check if the 8 pixels around the current pixels is also a colored pixel
+/// @param I : BMP Image
+/// @param x : x coordinate
+/// @param y : y coordinate
+/// @param previous : previous pixel
+/// @return the vector between the current pixel and the next colored pixel but also return the new coordinates with pointer
+int nextPixel(Image I, int *x, int *y, int previous)
 {
     int value = 0;
-    // printf("x : %d, y : %d, %u %u %u\n", *x, *y, I.rgb[*x][*y].red, I.rgb[*x][*y].blue, I.rgb[*x][*y].green);
     //  Right
     if (I.rgb[*x][*y + 1].red == 255 && I.rgb[*x][*y + 1].green == 0 && I.rgb[*x][*y + 1].blue == 0 && previous != 4)
     {
@@ -46,81 +66,85 @@ int freemanCase(Image I, int *x, int *y, int previous)
         *y += 1;
     }
 
-        // Down Right
+    // Down Right
     else if (I.rgb[*x + 1][*y + 1].red == 255 && I.rgb[*x + 1][*y + 1].green == 0 && I.rgb[*x + 1][*y + 1].blue == 0 && previous != 5)
     {
         value = 1;
         *x += 1;
         *y += 1;
     }
-        // Down
+    // Down
     else if (I.rgb[*x + 1][*y].red == 255 && I.rgb[*x + 1][*y].green == 0 && I.rgb[*x + 1][*y].blue == 0 && previous != 6)
     {
         value = 2;
         *x += 1;
     }
-        // Down Left
+    // Down Left
     else if (I.rgb[*x + 1][*y - 1].red == 255 && I.rgb[*x + 1][*y - 1].green == 0 && I.rgb[*x + 1][*y - 1].blue == 0 && previous != 7)
     {
         value = 3;
         *x += 1;
         *y -= 1;
     }
-        // Left
+    // Left
     else if (I.rgb[*x][*y - 1].red == 255 && I.rgb[*x][*y - 1].green == 0 && I.rgb[*x][*y - 1].blue == 0 && previous != 0)
     {
         value = 4;
         *y -= 1;
     }
-        // Up Left
+    // Up Left
     else if (I.rgb[*x - 1][*y - 1].red == 255 && I.rgb[*x - 1][*y - 1].green == 0 && I.rgb[*x - 1][*y - 1].blue == 0 && previous != 1)
     {
         value = 5;
         *x -= 1;
         *y -= 1;
     }
-        // Up
+    // Up
     else if (I.rgb[*x - 1][*y].red == 255 && I.rgb[*x - 1][*y].green == 0 && I.rgb[*x - 1][*y].blue == 0 && previous != 2)
     {
         value = 6;
         *x -= 1;
     }
-        // Up Right
+    // Up Right
     else if (I.rgb[*x - 1][*y + 1].red == 255 && I.rgb[*x - 1][*y + 1].green == 0 && I.rgb[*x - 1][*y + 1].blue == 0 && previous != 3)
     {
         value = 7;
         *x -= 1;
         *y += 1;
     }
-    // printf("%d\n", value);
     return value;
 }
 
-/* Calcul des coordonées du barycentre entre 2 points (fonction intermédiaire)*/
-
-Coordinates barycentre(Coordinates coordinateA, Coordinates coordinateB)
+/// @brief Calculate the barycentre between 2 coordinates
+/// @param coordinatesA
+/// @param coordinatesB
+/// @return coordinates of the barycentre
+Coordinates barycentre(Coordinates coordinatesA, Coordinates coordinatesB)
 {
     Coordinates bary;
-    bary.x = (coordinateA.x + coordinateB.x) / 2;
-    bary.y = (coordinateA.y + coordinateB.y) / 2;
+    bary.x = (coordinatesA.x + coordinatesB.x) / 2;
+    bary.y = (coordinatesA.y + coordinatesB.y) / 2;
     return bary;
 }
 
-
-// Calcul de la dictance entre le barycentre et la point évalué.
-
-float distance(Coordinates coordinateI, Coordinates coordinateJ)
+/// @brief Calculate the distance between 2 coordinates
+/// @param coordinatesA
+/// @param coordinatesB
+/// @return the distance between 2 coordinates
+float distance(Coordinates coordinatesA, Coordinates coordinatesB)
 {
-    return sqrt(pow((coordinateJ.x - coordinateI.x), 2) + pow((coordinateJ.y - coordinateI.y), 2));
+    return sqrt(pow((coordinatesB.x - coordinatesA.x), 2) + pow((coordinatesB.y - coordinatesA.y), 2));
 }
 
-// Retourne les projections sur x et y
-
-float *projection(Coordinates coordinateA, Coordinates coordinateB)
+/// @brief Calculate the projection of the perpendicular of the barycentre
+/// @param coordinatesA
+/// @param coordinatesB
+/// @return trigonometry projection on x and y
+float *projection(Coordinates coordinatesA, Coordinates coordinatesB)
 {
     // Vérifier projection du coefficient directeur avec Clem
-    float coefficientX = coordinateB.x - coordinateA.x;
-    float coefficientY = coordinateB.y - coordinateA.y;
+    float coefficientX = coordinatesB.x - coordinatesA.x;
+    float coefficientY = coordinatesB.y - coordinatesA.y;
     float *proj = (float *)malloc(sizeof(float) * 2);
     if (coefficientX == 0)
     {
@@ -134,22 +158,24 @@ float *projection(Coordinates coordinateA, Coordinates coordinateB)
     }
     else
     {
-        // Calcul du coefficent directeur de la droite partant du barycentre et perpendiculaire à (D,A)
+        // Calculate the directing coefficient of the perpendicular of the barycentre
         float theta = atan(coefficientY / coefficientX);
-        proj[0] = sin(theta); // projection sur x
-        proj[1] = cos(theta); // projection sur y
+        proj[0] = sin(theta); // X projection
+        proj[1] = cos(theta); // Y Projection
     }
-
-    //printf("P[0] : %f, P[1] : %f\n", proj[0], proj[1]);
     return proj;
 }
 
-//- Evaluer les 8 cases autour du point de coordonées inter calculées à la fonction CoordIntersection
-//- Regarder si une d'entre elles est rouge
-//- Si oui, calcul de la distance entre inter et le barycentre
-//- Si non, passage au point suivant
-
-float evaluation(Coordinates inter, int x, int y, Image I, Coordinates coordBary)
+/// @brief Evaluate 8 pixels around current pixel.
+/// If one is colored, calculate the distance between the pixel and the bary center,
+/// @param inter : Coordinates of a point on the perpendicular on the barycentre
+/// @param x : x coordinate of inter
+/// @param y : y coordinate of inter
+/// @param I : BMP Image
+/// @param coordBary : Barycentre Coordinates
+/// @return -1 : if no pixel found
+/// distance : if pixel found
+float evaluation(Image I, Coordinates inter, int x, int y, Coordinates coordBary)
 {
     float d = 0;
     int found = 0;
@@ -159,46 +185,47 @@ float evaluation(Coordinates inter, int x, int y, Image I, Coordinates coordBary
     }
     else
     {
+        // Current
         if (I.rgb[x][y].red == 255 && I.rgb[x][y].green == 0 && I.rgb[x][y].blue == 0)
         {
             found = 1;
         }
-            // Droite
+        // Right
         else if (I.rgb[x][y + 1].red == 255 && I.rgb[x][y + 1].green == 0 && I.rgb[x][y + 1].blue == 0)
         {
             found = 1;
         }
-            // Diagonale droite bas
+        // Down Right
         else if (I.rgb[x + 1][y + 1].red == 255 && I.rgb[x + 1][y + 1].green == 0 && I.rgb[x + 1][y + 1].blue == 0)
         {
             found = 1;
         }
-            // Bas
+        // Down
         else if (I.rgb[x + 1][y].red == 255 && I.rgb[x + 1][y].green == 0 && I.rgb[x + 1][y].blue == 0)
         {
             found = 1;
         }
-            // Diagonale gauche bas
+        // Down Left
         else if (I.rgb[x + 1][y - 1].red == 255 && I.rgb[x + 1][y - 1].green == 0 && I.rgb[x + 1][y - 1].blue == 0)
         {
             found = 1;
         }
-            // Gauche
+        // Left
         else if (I.rgb[x][y - 1].red == 255 && I.rgb[x][y - 1].green == 0 && I.rgb[x][y - 1].blue == 0)
         {
             found = 1;
         }
-            // Diagonale gauche haut
+        // Up Left
         else if (I.rgb[x - 1][y - 1].red == 255 && I.rgb[x - 1][y - 1].green == 0 && I.rgb[x - 1][y - 1].blue == 0)
         {
             found = 1;
         }
-            // Haut
+        // Up
         else if (I.rgb[x - 1][y].red == 255 && I.rgb[x - 1][y].green == 0 && I.rgb[x - 1][y].blue == 0)
         {
             found = 1;
         }
-            // Diagonale haut droite
+        // Up Right
         else if (I.rgb[x - 1][y + 1].red == 255 && I.rgb[x - 1][y + 1].green == 0 && I.rgb[x - 1][y + 1].blue == 0)
         {
             found = 1;
@@ -217,12 +244,18 @@ float evaluation(Coordinates inter, int x, int y, Image I, Coordinates coordBary
     return d;
 }
 
-float recherche(Image I, Coordinates coordBary, float *P)
+/// @brief Search the distance between the barycentre and the nearest colored pixel
+/// @param I : BMP Image
+/// @param coordBary : Coordinates of the Barycentre
+/// @param P : Trigonometry projection
+/// @return distance
+float research(Image I, Coordinates coordBary, float *P)
 {
     int j = 0;
     int i = 1;
     float d = -1;
-    Coordinates inter = {coordBary.x + P[0], coordBary.y + P[1]}; // P : Tableau des projections multipliés par un facteur entier dans un while de la boucle main (si question demander à César)
+    // P : Tableau des projections multipliés par un facteur entier dans un while de la boucle main (si question demander à César)
+    Coordinates inter = {coordBary.x + P[0], coordBary.y + P[1]};
     Coordinates newCoord = {0, 0};
 
     while (d == -1)
@@ -238,7 +271,7 @@ float recherche(Image I, Coordinates coordBary, float *P)
             newCoord.y = -i * P[1] + inter.y;
             i++;
         }
-        d = evaluation(newCoord, newCoord.y, newCoord.x, I, coordBary);
+        d = evaluation(I, newCoord, newCoord.y, newCoord.x, coordBary);
         j++;
     }
     return d;

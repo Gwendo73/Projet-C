@@ -1,18 +1,22 @@
-#include "bmp.h"
+#include "headers/bmp.h"
 
-void readBMPHeader(FILE *bitmapfile, BMPHeader *header, BMPInfo *info)
-{ 
-    if (bitmapfile == NULL)
+/// @brief Read a BMP header of a BMP image
+/// @param file : Name of the file
+/// @param header : First part of the header
+/// @param info : Second part of the header
+void readBMPHeader(FILE *file, BMPHeader *header, BMPInfo *info)
+{
+    if (file == NULL)
     {
         printf("Error when reading...!\n");
         exit(-1);
     }
-    fread(&header->name, sizeof(char), 2, bitmapfile);
-    fread(&header->size, 12, 1, bitmapfile);
-    fread(info, sizeof(BMPInfo), 1, bitmapfile);
+    fread(&header->name, sizeof(char), 2, file);
+    fread(&header->size, 12, 1, file);
+    fread(info, sizeof(BMPInfo), 1, file);
 }
 
-void printBMPHeader(char* name, BMPHeader header, BMPInfo info)
+void printBMPHeader(char *name, BMPHeader header, BMPInfo info)
 {
     printf("Type de bitmap\n");
     printf("%c%c\n", name[0], name[1]);

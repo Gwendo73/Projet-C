@@ -28,7 +28,7 @@ typedef struct
 
 Image readImage(FILE *f, int height, int width);
 void freeImage(Image I);
-Coordinates getCoordinates(Image I);
+Coordinates getFirstCoordinates(Image I);
 void printPixels(Image I);
 void createImage(BMPHeader header, BMPInfo info, Image I);
 

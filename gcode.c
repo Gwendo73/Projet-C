@@ -1,22 +1,30 @@
-#include "gcode.h"
+#include "headers/gcode.h"
 
+/// @brief Create a txt file with our coordinates that we allow us to run G-Code
+/// @param coord : Coordinates of our figure
+/// @param l : Number of coordinates
 void createGCode(Coordinates *coord, int l)
 {
-    FILE *f = fopen("gcode.txt", "w");
+    FILE *f = fopen("result/gcode.txt", "w");
 
     for (int i = 0; i < l; i++)
     {
         if (i < 10)
         {
-            fprintf(f, "N0%d G01 X%d Y%d", i, coord[i].x, coord[i].y);
-        } 
-        else 
+            fprintf(f, "N0%d G01 X%d Y%d\n", i, coord[i].x, coord[i].y);
+        }
+        else
         {
-            fprintf(f, "N%d G01 X%d Y%d", i, coord[i].x, coord[i].y);
+            fprintf(f, "N%d G01 X%d Y%d\n", i, coord[i].x, coord[i].y);
         }
-        if(i < l - 1) {
-            fprintf(f, "\n");
-        }
+    }
+    if (l < 10)
+    {
+        fprintf(f, "N0%d G01 X%d Y%d", l, coord[0].x, coord[0].y);
+    }
+    else
+    {
+        fprintf(f, "N%d G01 X%d Y%d", l, coord[0].x, coord[0].y);
     }
     fclose(f);
 }

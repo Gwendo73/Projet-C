@@ -27,7 +27,7 @@ typedef struct
     unsigned int colorsimportant;
 } BMPInfo;
 
-void readBMPHeader (FILE* bitmapfile, BMPHeader *header, BMPInfo *info);
+void readBMPHeader (FILE* file, BMPHeader *header, BMPInfo *info);
 void printBMPHeader (char* name, BMPHeader header, BMPInfo info);
 
 #endif

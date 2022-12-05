@@ -1,5 +1,10 @@
-#include "image.h"
+#include "headers/image.h"
 
+/// @brief Read every pixel of the BMP file
+/// @param f : BMP file
+/// @param height : Height of the image
+/// @param width : Width of the image
+/// @return the image converted into a structure
 Image readImage(FILE *f, int height, int width)
 {
     Image I;
@@ -18,6 +23,8 @@ Image readImage(FILE *f, int height, int width)
     return I;
 }
 
+/// @brief Liberate memory allocation for the image
+/// @param I : BMP Image
 void freeImage(Image I)
 {
     for (int i = I.height - 1; i >= 0; i--)
@@ -27,7 +34,10 @@ void freeImage(Image I)
     free(I.rgb);
 }
 
-Coordinates getCoordinates(Image I)
+/// @brief Get the first coordinates that we find
+/// @param I : BMP Image
+/// @return Coordinates
+Coordinates getFirstCoordinates(Image I)
 {
     int found = 1;
     Coordinates coordinate = {0, 0};
