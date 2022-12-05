@@ -16,8 +16,8 @@ calculation.o : calculation.c
 	gcc -c -Wall calculation.c
 
 clean:
-ifeq ($(OS),Windows_NT)
-	del /F *.o
+ifeq ($(OS), Windows_NT)
+	rm -f *.o
 else
 	rm -f *.o
 endif
