@@ -1,11 +1,10 @@
 #include "calculation.h"
 
-void freemanArray(Image I)
+Coordinates* freemanArray(Image I, int *l)
 {
     int value = 0;
-    Coordinates *figure = (Coordinates *)malloc(sizeof(Coordinates) * 500);
+    Coordinates *figure = malloc(sizeof(Coordinates) * 500);
     int k = 0;
-    int l = 0;
     float distance = 0;
     float *P = (float *)malloc(sizeof(float) * 2);
     Coordinates coordinate = getCoordinates(I);
@@ -14,6 +13,8 @@ void freemanArray(Image I)
     Coordinates baryCoord = {0, 0};
     value = freemanCase(I, &newCoordinate.y, &newCoordinate.x, -1);
     k++;
+    figure[*l] = startCoord;
+    *l += 1;
     while (coordinate.x != newCoordinate.x || coordinate.y != newCoordinate.y)
     {
         value = freemanCase(I, &newCoordinate.y, &newCoordinate.x, value);
@@ -23,30 +24,15 @@ void freemanArray(Image I)
         distance = recherche(I, baryCoord, P);
         if (distance > 10)
         { // Si distance superieur à XXX alors on change de point de départ
-            figure[l] = startCoord;
+            figure[*l] = newCoordinate;
             startCoord.x = newCoordinate.x;
             startCoord.y = newCoordinate.y;
-            l++;
+            *l += 1;
         }
         ///
         k++;
     }
-    // int *newVectors = (int *)malloc(sizeof(int) * k);
-    Coordinates *newFigure = (Coordinates *)malloc(sizeof(Coordinates) * l);
-    // for (int i = 0; i < k; i++)
-    // {
-    //     newVectors[i] = vectors[i];
-    //     printf("%d", newVectors[i]);
-    // }
-    for (int i = 0; i < l; i++)
-    {
-        newFigure[i] = figure[i];
-        printf("%d, x : %d, y : %d\n", i + 1, newFigure[i].x, newFigure[i].y);
-    }
-    // free(vectors);
-    free(figure);
-    // free(newVectors);
-    free(newFigure);
+    return figure;
 }
 
 int freemanCase(Image I, int *x, int *y, int previous)
@@ -60,46 +46,46 @@ int freemanCase(Image I, int *x, int *y, int previous)
         *y += 1;
     }
 
-    // Down Right
+        // Down Right
     else if (I.rgb[*x + 1][*y + 1].red == 255 && I.rgb[*x + 1][*y + 1].green == 0 && I.rgb[*x + 1][*y + 1].blue == 0 && previous != 5)
     {
         value = 1;
         *x += 1;
         *y += 1;
     }
-    // Down
+        // Down
     else if (I.rgb[*x + 1][*y].red == 255 && I.rgb[*x + 1][*y].green == 0 && I.rgb[*x + 1][*y].blue == 0 && previous != 6)
     {
         value = 2;
         *x += 1;
     }
-    // Down Left
+        // Down Left
     else if (I.rgb[*x + 1][*y - 1].red == 255 && I.rgb[*x + 1][*y - 1].green == 0 && I.rgb[*x + 1][*y - 1].blue == 0 && previous != 7)
     {
         value = 3;
         *x += 1;
         *y -= 1;
     }
-    // Left
+        // Left
     else if (I.rgb[*x][*y - 1].red == 255 && I.rgb[*x][*y - 1].green == 0 && I.rgb[*x][*y - 1].blue == 0 && previous != 0)
     {
         value = 4;
         *y -= 1;
     }
-    // Up Left
+        // Up Left
     else if (I.rgb[*x - 1][*y - 1].red == 255 && I.rgb[*x - 1][*y - 1].green == 0 && I.rgb[*x - 1][*y - 1].blue == 0 && previous != 1)
     {
         value = 5;
         *x -= 1;
         *y -= 1;
     }
-    // Up
+        // Up
     else if (I.rgb[*x - 1][*y].red == 255 && I.rgb[*x - 1][*y].green == 0 && I.rgb[*x - 1][*y].blue == 0 && previous != 2)
     {
         value = 6;
         *x -= 1;
     }
-    // Up Right
+        // Up Right
     else if (I.rgb[*x - 1][*y + 1].red == 255 && I.rgb[*x - 1][*y + 1].green == 0 && I.rgb[*x - 1][*y + 1].blue == 0 && previous != 3)
     {
         value = 7;
@@ -177,42 +163,42 @@ float evaluation(Coordinates inter, int x, int y, Image I, Coordinates coordBary
         {
             found = 1;
         }
-        // Droite
+            // Droite
         else if (I.rgb[x][y + 1].red == 255 && I.rgb[x][y + 1].green == 0 && I.rgb[x][y + 1].blue == 0)
         {
             found = 1;
         }
-        // Diagonale droite bas
+            // Diagonale droite bas
         else if (I.rgb[x + 1][y + 1].red == 255 && I.rgb[x + 1][y + 1].green == 0 && I.rgb[x + 1][y + 1].blue == 0)
         {
             found = 1;
         }
-        // Bas
+            // Bas
         else if (I.rgb[x + 1][y].red == 255 && I.rgb[x + 1][y].green == 0 && I.rgb[x + 1][y].blue == 0)
         {
             found = 1;
         }
-        // Diagonale gauche bas
+            // Diagonale gauche bas
         else if (I.rgb[x + 1][y - 1].red == 255 && I.rgb[x + 1][y - 1].green == 0 && I.rgb[x + 1][y - 1].blue == 0)
         {
             found = 1;
         }
-        // Gauche
+            // Gauche
         else if (I.rgb[x][y - 1].red == 255 && I.rgb[x][y - 1].green == 0 && I.rgb[x][y - 1].blue == 0)
         {
             found = 1;
         }
-        // Diagonale gauche haut
+            // Diagonale gauche haut
         else if (I.rgb[x - 1][y - 1].red == 255 && I.rgb[x - 1][y - 1].green == 0 && I.rgb[x - 1][y - 1].blue == 0)
         {
             found = 1;
         }
-        // Haut
+            // Haut
         else if (I.rgb[x - 1][y].red == 255 && I.rgb[x - 1][y].green == 0 && I.rgb[x - 1][y].blue == 0)
         {
             found = 1;
         }
-        // Diagonale haut droite
+            // Diagonale haut droite
         else if (I.rgb[x - 1][y + 1].red == 255 && I.rgb[x - 1][y + 1].green == 0 && I.rgb[x - 1][y + 1].blue == 0)
         {
             found = 1;

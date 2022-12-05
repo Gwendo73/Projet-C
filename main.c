@@ -3,6 +3,7 @@
 #include "bmp.h"
 #include "image.h"
 #include "calculation.h"
+#include "gcode.h"
 
 
 int main()
@@ -12,6 +13,8 @@ int main()
     BMPHeader *headerptr = &header;
     BMPInfo info;
     BMPInfo *infoptr = &info;
+    int l = 0;
+
 
     readBMPHeader(bitmapfile, headerptr, infoptr);
     //printBMPHeader(header.name, header, info);
@@ -21,8 +24,18 @@ int main()
 
     //getCoordinates(image);
     //createImage(header, info, image);
-    freemanArray(image);
-    
+    Coordinates *coordinates = (Coordinates *)malloc(sizeof(Coordinates) * 500);
+    coordinates = freemanArray(image, &l);
+    Coordinates *coordinatesAdapted = (Coordinates *)malloc(sizeof(Coordinates) * l);
+    for (int i = 0; i < l; i++)
+    {
+        coordinatesAdapted[i] = coordinates[i];
+        printf("%d, x : %d, y : %d\n", i + 1, coordinatesAdapted[i].x, coordinatesAdapted[i].y);
+    }
+    free(coordinates);
+
+    createGCode(coordinatesAdapted, l);
+    free(coordinatesAdapted);
 
     fclose(bitmapfile);
     freeImage(image);

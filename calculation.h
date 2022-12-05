@@ -5,7 +5,7 @@
 #ifndef _CALCULATION_H_
 #define _CALCULATION_H_
 
-void freemanArray(Image I);
+Coordinates* freemanArray(Image I, int *l);
 int freemanCase(Image I, int *x, int *y, int previous);
 Coordinates barycentre(Coordinates coordinateA, Coordinates coordinateB);
 float distance(Coordinates coordinateA, Coordinates coordinateB);
