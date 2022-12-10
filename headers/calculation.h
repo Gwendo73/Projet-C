@@ -5,7 +5,7 @@
 #ifndef _CALCULATION_H_
 #define _CALCULATION_H_
 
-Coordinates* figureCoordinates(Image I, int *l);
+Coordinates *figureCoordinates(Image I, int *l, int distanceTarget);
 int nextPixel(Image I, int *x, int *y, int previous);
 Coordinates barycentre(Coordinates coordinatesA, Coordinates coordinatesB);
 float distance(Coordinates coordinatesA, Coordinates coordinatesB);

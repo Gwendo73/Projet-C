@@ -7,6 +7,11 @@ void createGCode(Coordinates *coord, int l)
 {
     FILE *f = fopen("result/gcode.txt", "w");
 
+    if(f == NULL) {
+        printf("Error when reading...!\n");
+        exit(-1);
+    }
+
     for (int i = 0; i < l; i++)
     {
         if (i < 10)
@@ -26,5 +31,6 @@ void createGCode(Coordinates *coord, int l)
     {
         fprintf(f, "N%d G01 X%d Y%d", l, coord[0].x, coord[0].y);
     }
+    printf("Le fichier gcode.txt a bien été enregistré sous le dossier result\n");
     fclose(f);
 }

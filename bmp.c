@@ -9,6 +9,7 @@ void readBMPHeader(FILE *file, BMPHeader *header, BMPInfo *info)
     if (file == NULL)
     {
         printf("Error when reading...!\n");
+        printf("Wrong use : ./main fileName distance\n");
         exit(-1);
     }
     fread(&header->name, sizeof(char), 2, file);
@@ -16,8 +17,13 @@ void readBMPHeader(FILE *file, BMPHeader *header, BMPInfo *info)
     fread(info, sizeof(BMPInfo), 1, file);
 }
 
+/// @brief Print every information about the header of the BMP file
+/// @param name : Name of the header (BP)
+/// @param header : First part of the header
+/// @param info : Second part of the header
 void printBMPHeader(char *name, BMPHeader header, BMPInfo info)
 {
+    printf("INFORMATIONS\n");
     printf("Type de bitmap\n");
     printf("%c%c\n", name[0], name[1]);
     printf("Taille de bitmap on octets:\n");
@@ -48,5 +54,5 @@ void printBMPHeader(char *name, BMPHeader header, BMPInfo info)
     printf("Palette:\n");
     printf("%u\n", info.colorsused);
     printf("Important:\n");
-    printf("%u\n", info.colorsimportant);
+    printf("%u\n\n", info.colorsimportant);
 }

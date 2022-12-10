@@ -3,9 +3,10 @@
 /// @brief Calculate the best solution to represent our figure with coordinates
 /// @param I : BMP Image
 /// @param l : Number of coordinates
+/// @param targetDistance : Minimum distance of the perpendicular
 /// @return the coordinates of our new figure
 
-Coordinates *figureCoordinates(Image I, int *l)
+Coordinates *figureCoordinates(Image I, int *l, int distanceTarget)
 {
     // Value of the vector
     int value = 0;
@@ -38,7 +39,7 @@ Coordinates *figureCoordinates(Image I, int *l)
         P = projection(startCoord, baryCoord);
         // Calculate perpendicular distance
         distance = research(I, baryCoord, P);
-        if (distance > 10)
+        if (distance > distanceTarget)
         {
             figure[*l] = currentCoordinates;
             startCoord.x = currentCoordinates.x;

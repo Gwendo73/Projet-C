@@ -20,7 +20,7 @@ gcode.o : gcode.c
 
 clean:
 ifeq ($(OS), Windows_NT)
-	rm -f *.o
+	del /F *.o
 else
 	rm -f *.o
 endif

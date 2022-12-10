@@ -58,27 +58,3 @@ Coordinates getFirstCoordinates(Image I)
     }
     return coordinate;
 }
-
-void printPixels(Image I) {
-    for (int i = 0; i < I.height; i++ )
-    {
-        for (int j = 0; j < I.width; j++ )
-        {
-            printf("Ligne %d Colonne %d : %u %u %u \n", i, j, I.rgb[i][j].red, I.rgb[i][j].green, I.rgb[i][j].blue);
-        }
-    }
-}
-
-void createImage(BMPHeader header, BMPInfo info, Image I)
-{
-    FILE *f = fopen("newPixel.bmp", "w");
-    fwrite(header.name, 2, 1, f);
-    fwrite(&header.size, 3 * sizeof(int), 1, f);
-    fwrite(&info, sizeof(BMPInfo), 1, f);
-
-    for (int i = I.height - 1; i >= 0; i--)
-    {
-        fwrite(I.rgb[i], I.width, sizeof(RGB), f);
-    }
-    fclose(f);
-}
