@@ -22,7 +22,10 @@ int main(int argc, char *argv[])
         strcat(fileName, argv[1]);
         targetDistance = atoi(argv[2]);
         file = fopen(fileName, "rb");
-    } else {
+        free(fileName);
+    }
+    else
+    {
         printf("Wrong use : ./main fileName distance\n");
         printf("Le fichier ouvert sera un coeur avec une distance de 5 par défaut\n\n");
         targetDistance = 5;
